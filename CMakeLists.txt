@@ -33,6 +33,7 @@ FetchContent_Declare(crow
         GIT_TAG master
         )
 
+set(EXPECTED_BUILD_TESTS OFF)
 if (NOT crow_POPULATED)
     FetchContent_Populate(crow)
     add_subdirectory(${crow_SOURCE_DIR} ${crow_BINARY_DIR})
@@ -44,8 +45,11 @@ FetchContent_Declare(expected
         GIT_TAG master
         )
 #FETCHCONTENT_MAKEAVAILABLE(expected)
+
 if (NOT expected_POPULATED)
     FetchContent_Populate(expected)
+    add_subdirectory(${expected_SOURCE_DIR})
+
 endif (NOT expected_POPULATED)
 
 
