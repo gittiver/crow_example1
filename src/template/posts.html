@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Posts</title>
+</head>
+<body>
+<h1>list of posts</h1>
+{{#posts}}
+<h2>{{title}}</h2>
+<p>{{content}}</p>
+<p><a href="post/edit/{{id}}">Edit</a></p>
+{{/posts}}
+
+</body>
+</html>

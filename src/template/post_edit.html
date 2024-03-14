@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List of Posts</title>
+</head>
+<body>
+<h1>Edit post</h1>
+
+<form action="{{post.id}}" method="post" id="edit_post">
+    <h2>{{title}}</h2>
+
+    <p>{{content}}</p>
+    <p><a href="/{{post.id}}">Edit</a></p>
+    <label class="h2" form="edit_post">Edit Post</label>
+    <label for="title">title</label>
+    <input type="text" name="title" id="title" maxlength="255" value="{{post.title}}">
+
+    <label for="content">content</label>
+    <input type="text" name="content" id="content"value="{{post.content}}">
+
+    <button type="reset">Eingaben zurücksetzen</button>
+    <button type="submit">Eingaben absenden</button>
+</form>
+
+</body>
+</html>

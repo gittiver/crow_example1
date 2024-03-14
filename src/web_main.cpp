@@ -54,10 +54,27 @@ bool validate_authentication(const crow::request &request, crow::response &respo
 
 int main() {
   crow::SimpleApp app;
-
-  CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::GET)
+  crow::mustache::set_global_base("template");
+  CROW_ROUTE(app, "/posts").methods(crow::HTTPMethod::GET)
       ([]() {
-        return model.posts().to_json();
+        auto page = crow::mustache::load("posts.html");
+        crow::mustache::context ctx;
+        ctx["posts"]= model.posts().to_json();
+
+        return page.render(ctx);
+      });
+
+  CROW_ROUTE(app, "/post/edit/<int>").methods(crow::HTTPMethod::GET,crow::HTTPMethod::POST)
+      ([](uint64_t id) {
+        auto page = crow::mustache::load("post_edit.html");
+        crow::mustache::context ctx;
+        auto post = model.read(id);
+        if (!post)
+          ctx["error"] = "post not found";
+        else
+          ctx["post"] = post.value().to_json();
+
+        return page.render(ctx);
       });
 
   CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::POST)

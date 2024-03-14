@@ -1,15 +1,5 @@
 #include "model.hpp"
 
-bool Model::delete_(uint64_t id) {
-  const std::lock_guard<std::mutex> g(mtx);
-  auto it = posts_.find(id);
-  if (it == posts_.end()) {
-    return false;
-  } else {
-    posts_.erase(it);
-    return true;
-  }
-}
 
 
 tl::expected <uint64_t, Err> Model::create(const Post &post) {
@@ -41,6 +31,17 @@ tl::expected <uint64_t, Err> Model::update(const Post &post) {
   }
 }
 
+bool Model::delete_(uint64_t id) {
+  const std::lock_guard<std::mutex> g(mtx);
+  auto it = posts_.find(id);
+  if (it == posts_.end()) {
+    return false;
+  } else {
+    posts_.erase(it);
+    return true;
+  }
+}
+
 crow::json::wvalue Post::to_json() const {
   crow::json::wvalue o;
   o["id"] = id;
@@ -68,3 +69,18 @@ tl::expected <Post, Err> Post::from_json(const std::string &string) {
     }
   }
 }
+
+crow::json::wvalue Posts::to_json() const {
+  crow::json::wvalue::list v;
+  for (const auto &post: *this) {
+    v.push_back(post.second.to_json());
+  }
+  crow::json::wvalue r(v);
+  return r;
+}
+
+
+std::string Model::get_token() {
+  return "token tbd";
+}
+

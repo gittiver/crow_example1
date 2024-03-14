@@ -20,7 +20,10 @@ struct Post {
   static tl::expected<Post, Err> from_json(const std::string &string);
 };
 
-typedef std::map<uint64_t, Post> Posts;
+struct Posts : public std::map<uint64_t, Post>{
+  [[nodiscard]] crow::json::wvalue to_json() const;
+
+};
 
 class Model {
   Posts posts_;
@@ -41,8 +44,6 @@ public:
 
   bool delete_(uint64_t id);
 
-  std::string get_token() {
-    return "token tbd";
-  }
+  std::string get_token();
 };
   

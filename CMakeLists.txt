@@ -72,9 +72,15 @@ add_library(lib-${PROJECT_NAME}
         )
 target_link_libraries(lib-${PROJECT_NAME} PUBLIC tl::expected Crow::Crow)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/bp_user_registration.cpp src/bp_user_registration.hpp)
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         lib-${PROJECT_NAME}
         )
 target_include_directories(${PROJECT_NAME} PRIVATE ${expected_SOURCE_DIR}/include) 
+
+add_executable(bp_main src/bp_main.cpp src/bp_user_registration.cpp src/bp_user_registration.hpp)
+target_link_libraries(bp_main PRIVATE lib-${PROJECT_NAME})
+
+add_executable(web_main src/web_main.cpp)
+target_link_libraries(web_main PRIVATE lib-${PROJECT_NAME})
