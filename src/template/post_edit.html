@@ -1,27 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>List of Posts</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>static!</title>
+    <link rel="stylesheet" href="/static/bulma.css">
 </head>
 <body>
-<h1>Edit post</h1>
+<section class="section">
+    <div class="container">
+        <h1 class="title">
+            Edit post
+        </h1>
+        <form action="/posts/edit/{{post.id}}" method="post" id="edit_post">
+            <p><a href="/posts">back to post list</a></p>
+            <label class="h2" form="edit_post">Edit Post</label>
+            <br>
+            <label for="title">title</label><br>
+            <input type="text" name="title" id="title" maxlength="255" value="{{post.title}}"><br>
+            <label for="content">content</label>
+            <br>
+            <textarea name="content" rows="10" cols="30">{{post.content}}</textarea>
+            <br>
 
-<form action="{{post.id}}" method="post" id="edit_post">
-    <h2>{{title}}</h2>
-
-    <p>{{content}}</p>
-    <p><a href="/{{post.id}}">Edit</a></p>
-    <label class="h2" form="edit_post">Edit Post</label>
-    <label for="title">title</label>
-    <input type="text" name="title" id="title" maxlength="255" value="{{post.title}}">
-
-    <label for="content">content</label>
-    <input type="text" name="content" id="content"value="{{post.content}}">
-
-    <button type="reset">Eingaben zurücksetzen</button>
-    <button type="submit">Eingaben absenden</button>
-</form>
-
+            <button type="reset">Eingaben zurücksetzen</button>
+            <button type="submit">Eingaben absenden</button>
+        </form>
+    </div>
+</section>
 </body>
 </html>

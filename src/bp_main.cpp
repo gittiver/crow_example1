@@ -60,6 +60,6 @@ int main() {
 
   app.register_blueprint(bpUserRegistration);
 
-  app.port(18080).run();
+  app.port(18080).multithreaded().run();
 
 }

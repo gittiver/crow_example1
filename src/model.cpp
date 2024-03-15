@@ -45,8 +45,10 @@ bool Model::delete_(uint64_t id) {
 crow::json::wvalue Post::to_json() const {
   crow::json::wvalue o;
   o["id"] = id;
-  o["title"] = title ? *title : nullptr;
-  o["content"] = content ? *content : nullptr;
+  if (title)
+    o["title"] = *title;
+  if (content)
+    o["content"] = *content;
   return o;
 }
 
@@ -83,4 +85,3 @@ crow::json::wvalue Posts::to_json() const {
 std::string Model::get_token() {
   return "token tbd";
 }
-

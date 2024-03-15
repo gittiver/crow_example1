@@ -46,7 +46,7 @@ bool validate_authentication(const crow::request &request, crow::response &respo
 #define CHECK_AUTHENTICATION(request) \
 { \
   crow::response response; \
-  if (!validate_authentication(req, response)) { \
+  if (!validate_authentication((request), response)) { \
     return response; \
   } \
 }
@@ -54,27 +54,65 @@ bool validate_authentication(const crow::request &request, crow::response &respo
 
 int main() {
   crow::SimpleApp app;
+
   crow::mustache::set_global_base("template");
+
   CROW_ROUTE(app, "/posts").methods(crow::HTTPMethod::GET)
       ([]() {
         auto page = crow::mustache::load("posts.html");
         crow::mustache::context ctx;
-        ctx["posts"]= model.posts().to_json();
+        ctx["posts"] = model.posts().to_json();
 
         return page.render(ctx);
       });
 
-  CROW_ROUTE(app, "/post/edit/<int>").methods(crow::HTTPMethod::GET,crow::HTTPMethod::POST)
-      ([](uint64_t id) {
-        auto page = crow::mustache::load("post_edit.html");
-        crow::mustache::context ctx;
+  CROW_ROUTE(app, "/posts/edit/<int>").methods(crow::HTTPMethod::GET, crow::HTTPMethod::POST)
+      ([](const crow::request &req, uint64_t id) {
         auto post = model.read(id);
-        if (!post)
+        crow::mustache::context ctx;
+        if (!post) {
           ctx["error"] = "post not found";
-        else
+        } else {
+          if (req.method == crow::HTTPMethod::POST) {
+            auto params = req.get_body_params();
+//           for (auto param : params.keys()) {
+//             CROW_LOG_DEBUG << param << ":" << params.get(param);
+//           }
+            post->title = params.get("title");
+            post->content = params.get("content");
+            model.update(post.value());
+          }
           ctx["post"] = post.value().to_json();
-
+        }
+        auto page = crow::mustache::load("post_edit.html");
         return page.render(ctx);
+      });
+
+  CROW_ROUTE(app, "/posts/add").methods(crow::HTTPMethod::GET, crow::HTTPMethod::POST)
+      ([]() {
+        Post p;
+        auto created = model.create(p);
+        crow::mustache::context ctx;
+        if (!created) {
+          ctx["error"] = "post not found";
+        } else {
+          auto post = model.read(created.value());
+          ctx["post"] = post.value().to_json();
+        }
+        auto page = crow::mustache::load("post_edit.html");
+        return page.render(ctx);
+      });
+
+  CROW_ROUTE(app, "/posts/delete/<int>").methods(crow::HTTPMethod::DELETE)
+      ([](int id) {
+        bool success = model.delete_(id);
+        crow::response response;
+        if (success) {
+          response.redirect("/posts");
+        } else {
+          response.code = crow::status::NOT_FOUND;
+        }
+        return response;
       });
 
   CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::POST)
@@ -88,7 +126,6 @@ int main() {
             return crow::response(crow::OK);
           else
             return crow::response(crow::BAD_REQUEST, error2json("json parse_error"));
-
         }
       });
 
@@ -133,27 +170,31 @@ int main() {
       });
 
   CROW_ROUTE(app, "/api/login").methods(crow::HTTPMethod::GET,
-                                    crow::HTTPMethod::POST)
+                                        crow::HTTPMethod::POST
+  )
       ([](const crow::request &req) {
          CHECK_AUTHENTICATION(req);
+
          // logged in successfully
          crow::json::wvalue w;
          w["token"] = model.get_token();
-
          return crow::response(crow::status::OK, w);
        }
-
       );
 
-  CROW_ROUTE(app, "/api/do_authenticated").
-      methods(crow::HTTPMethod::POST, crow::HTTPMethod::GET)
+  CROW_ROUTE(app, "/api/do_authenticated").methods(crow::HTTPMethod::POST,
+                                                   crow::HTTPMethod::GET)
       ([](const crow::request &req) {
         CHECK_AUTHENTICATION(req);
 
-        CROW_LOG_INFO << "do authenticated after successful authentication";
-        return crow::response(crow::status::OK);
+        CROW_LOG_INFO
+          << "do authenticated after successful authentication";
+        return
+            crow::response(crow::status::OK);
       });
 
-  app.port(18080).run();
+  app.loglevel(crow::LogLevel::DEBUG)
+     .port(18080)
+     .run();
 
 }
