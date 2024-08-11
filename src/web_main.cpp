@@ -1,8 +1,5 @@
 #include "crow/http_response.h"
 #include "crow/json.h"
-#include <optional>
-
-#define CROW_MAIN
 
 #include "crow.h"
 
@@ -75,9 +72,6 @@ int main() {
         } else {
           if (req.method == crow::HTTPMethod::POST) {
             auto params = req.get_body_params();
-//           for (auto param : params.keys()) {
-//             CROW_LOG_DEBUG << param << ":" << params.get(param);
-//           }
             post->title = params.get("title");
             post->content = params.get("content");
             model.update(post.value());
@@ -194,7 +188,7 @@ int main() {
       });
 
   app.loglevel(crow::LogLevel::DEBUG)
+     .multithreaded()
      .port(18080)
      .run();
-
 }

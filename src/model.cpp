@@ -55,9 +55,7 @@ crow::json::wvalue Post::to_json() const {
 tl::expected <Post, Err> Post::from_json(const std::string &string) {
   Post post;
   auto json = crow::json::load(string);
-  if (!json) {
-    return tl::unexpected(Err::JSON_PARSE_ERROR);
-  } else if (!json.has("id")) {
+  if (!json || !json.has("id")) {
     return tl::unexpected(Err::JSON_PARSE_ERROR);
   } else {
     try {

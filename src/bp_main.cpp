@@ -1,9 +1,5 @@
 #include "crow/http_response.h"
 #include "crow/json.h"
-#include <optional>
-
-#define CROW_MAIN
-
 #include "crow.h"
 
 #include "model.hpp"

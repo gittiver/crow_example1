@@ -1,8 +1,5 @@
 #include "crow/http_response.h"
 #include "crow/json.h"
-#include <optional>
-
-#define CROW_MAIN
 
 #include "crow.h"
 
@@ -52,10 +49,25 @@ bool validate_authentication(const crow::request &request, crow::response &respo
 }
 // End of Authentication utilities
 
+struct AuthenticatedMiddleware : crow::ILocalMiddleware
+{
+  struct context
+  {};
+  void before_handle(crow::request& req, crow::response& res, context& ctx) {
+    CROW_LOG_DEBUG << "check auth for " << req.url;
+    if (!validate_authentication(req, res)) {
+      res.end();
+    }
+  }
+  void after_handle(crow::request& req, crow::response& res, context& ctx)
+  {}
+};
+
 int main() {
-  crow::SimpleApp app;
+  crow::App<AuthenticatedMiddleware> app;
 
   CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::GET)
+      .CROW_MIDDLEWARES(app, AuthenticatedMiddleware)
       ([]() {
         return model.posts().to_json();
       });
@@ -137,6 +149,6 @@ int main() {
         return crow::response(crow::status::OK);
       });
 
-  app.port(18080).run();
+  app.port(18080).loglevel(crow::LogLevel::DEBUG).run();
 
 }
