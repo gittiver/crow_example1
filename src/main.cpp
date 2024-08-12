@@ -1,5 +1,8 @@
 #include "crow/http_response.h"
 #include "crow/json.h"
+#include <optional>
+
+#define CROW_MAIN
 
 #include "crow.h"
 
@@ -49,30 +52,15 @@ bool validate_authentication(const crow::request &request, crow::response &respo
 }
 // End of Authentication utilities
 
-struct AuthenticatedMiddleware : crow::ILocalMiddleware
-{
-  struct context
-  {};
-  void before_handle(crow::request& req, crow::response& res, context& ctx) {
-    CROW_LOG_DEBUG << "check auth for " << req.url;
-    if (!validate_authentication(req, res)) {
-      res.end();
-    }
-  }
-  void after_handle(crow::request& req, crow::response& res, context& ctx)
-  {}
-};
-
 int main() {
-  crow::App<AuthenticatedMiddleware> app;
+  crow::SimpleApp app;
 
-  CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::GET)
-      .CROW_MIDDLEWARES(app, AuthenticatedMiddleware)
+  CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::Get)
       ([]() {
         return model.posts().to_json();
       });
 
-  CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::POST)
+  CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::Post)
       ([](const crow::request &req) {
         auto post = Post::from_json(req.body);
         if (!post) {
@@ -87,7 +75,7 @@ int main() {
         }
       });
 
-  CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::PUT)
+  CROW_ROUTE(app, "/api/posts").methods(crow::HTTPMethod::Put)
       ([](const crow::request &req) {
         crow::status rc;
         crow::json::wvalue json_response;
@@ -108,7 +96,7 @@ int main() {
         return crow::response(rc, json_response);
       });
 
-  CROW_ROUTE(app, "/api/posts/<int>").methods(crow::HTTPMethod::GET)
+  CROW_ROUTE(app, "/api/posts/<int>").methods(crow::HTTPMethod::Get)
       ([](uint64_t id) {
         auto g = model.read(id);
         if (!g)
@@ -117,7 +105,7 @@ int main() {
           return crow::response(crow::OK, g->to_json());
       });
 
-  CROW_ROUTE(app, "/api/posts/<int>").methods(crow::HTTPMethod::DELETE)
+  CROW_ROUTE(app, "/api/posts/<int>").methods(crow::HTTPMethod::Delete)
       ([](const crow::request & /*req*/, int id) {
         bool success = model.delete_(id);
         if (!success) {
@@ -127,8 +115,8 @@ int main() {
         }
       });
 
-  CROW_ROUTE(app, "/api/login").methods(crow::HTTPMethod::GET,
-                                    crow::HTTPMethod::POST)
+  CROW_ROUTE(app, "/api/login").methods(crow::HTTPMethod::Get,
+                                    crow::HTTPMethod::Post)
       ([](const crow::request &req) {
          CHECK_AUTHENTICATION(req);
          // logged in successfully
@@ -141,7 +129,7 @@ int main() {
       );
 
   CROW_ROUTE(app, "/api/do_authenticated").
-      methods(crow::HTTPMethod::POST, crow::HTTPMethod::GET)
+      methods(crow::HTTPMethod::Post, crow::HTTPMethod::Get)
       ([](const crow::request &req) {
         CHECK_AUTHENTICATION(req);
 
@@ -149,6 +137,6 @@ int main() {
         return crow::response(crow::status::OK);
       });
 
-  app.port(18080).loglevel(crow::LogLevel::DEBUG).run();
+  app.port(18080).run();
 
 }
