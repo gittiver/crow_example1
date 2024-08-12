@@ -34,3 +34,5 @@
 # local build folders
 build
 cmake-build-debug
+/.vs
+/vcpkg_installed
