@@ -1,8 +1,7 @@
+#include "auth.hpp"
 #include "crow/http_response.h"
 #include "crow/json.h"
 #include <optional>
-
-#define CROW_MAIN
 
 #include "crow.h"
 
@@ -16,45 +15,9 @@ crow::json::wvalue error2json(const std::string &errstring) {
   return r;
 }
 
-// Authentication utilities
-bool is_valid(const std::string &username, const std::string &password) {
-  return username == "frank" && password == "frank";
-}
-
-bool validate_authentication(const crow::request &request, crow::response &response) {
-  std::string myauth = request.get_header_value("Authorization");
-  if (myauth.empty()) {
-    response.code = crow::status::UNAUTHORIZED;
-    response.set_header("WWW-Authenticate",
-                        "Basic realm=\"User Visible Realm\", charset=\"UTF-8\"");
-    return false;
-  } else {
-    // Cut off starting "Basic "
-    std::string mycreds = myauth.substr(6);
-    // decode base64
-    std::string d_mycreds = crow::utility::base64decode(mycreds, mycreds.size());
-    // Now that we have our username:password string,
-    // we only need to separate it into 2 different strings
-    // and verify their validity:
-    size_t found = d_mycreds.find(':');
-    std::string username = d_mycreds.substr(0, found);
-    std::string password = d_mycreds.substr(found + 1);
-    return is_valid(username, password);
-  }
-}
-
-#define CHECK_AUTHENTICATION(request) \
-{ \
-  crow::response response; \
-  if (!validate_authentication((request), response)) { \
-    return response; \
-  } \
-}
-// End of Authentication utilities
-
 int main() {
-  crow::SimpleApp app;
-
+  crow::App<LoginRequiredMiddleware> app;
+  
   crow::mustache::set_global_base("template");
 
   CROW_ROUTE(app, "/posts").methods(crow::HTTPMethod::Get)
@@ -169,32 +132,31 @@ int main() {
         }
       });
 
-  CROW_ROUTE(app, "/api/login").methods(crow::HTTPMethod::Get,
-                                        crow::HTTPMethod::Post
-  )
-      ([](const crow::request &req) {
-         CHECK_AUTHENTICATION(req);
+  CROW_ROUTE(app, "/api/login")
+      .methods(crow::HTTPMethod::Get, crow::HTTPMethod::Post)
+      .CROW_MIDDLEWARES(app, LoginRequiredMiddleware)
+          ([](const crow::request &req) {
 
-         // logged in successfully
-         crow::json::wvalue w;
-         w["token"] = model.get_token();
-         return crow::response(crow::status::OK, w);
-       }
-      );
+             // logged in successfully
+             crow::json::wvalue w;
+             w["token"] = model.get_token();
+             return crow::response(crow::status::OK, w);
+           }
+          );
 
-  CROW_ROUTE(app, "/api/do_authenticated").methods(crow::HTTPMethod::Post,
-                                                   crow::HTTPMethod::Get)
-      ([](const crow::request &req) {
-        CHECK_AUTHENTICATION(req);
+  CROW_ROUTE(app, "/api/do_authenticated")
+      .methods(crow::HTTPMethod::Post, crow::HTTPMethod::Get)
+      .CROW_LOGIN_REQUIRED(app)
+          ([](const crow::request &req) {
 
-        CROW_LOG_INFO
-          << "do authenticated after successful authentication";
-        return
-            crow::response(crow::status::OK);
-      });
+            CROW_LOG_INFO
+              << "do authenticated after successful authentication";
+            return
+                crow::response(crow::status::OK);
+          });
 
   app.loglevel(crow::LogLevel::Debug)
-     .port(18080)
-     .run();
+      .port(18080)
+      .run();
 
 }

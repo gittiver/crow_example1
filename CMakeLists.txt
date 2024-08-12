@@ -66,6 +66,7 @@ FetchContent_MakeAvailable(Catch2)
 add_library(lib-${PROJECT_NAME}
         src/model.cpp
         src/model.hpp
+        src/auth.hpp
         )
 target_link_libraries(lib-${PROJECT_NAME} PUBLIC tl::expected Crow::Crow)
 
