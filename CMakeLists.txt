@@ -10,12 +10,6 @@ if (POLICY CMP0077)
     cmake_policy(SET CMP0077 NEW)
 endif ()
 
-if (MSVC)
-    add_compile_options(/W4 /WX)
-else ()
-    add_compile_options(-Wall -Wextra -pedantic)
-endif ()
-
 project(crow-example1 VERSION 0.0.1 LANGUAGES CXX)
 
 option(${PROJECT_NAME}_ENABLE_TESTS "enable testing" OFF)
@@ -69,13 +63,18 @@ add_library(lib-${PROJECT_NAME}
         src/auth.hpp
         )
 target_link_libraries(lib-${PROJECT_NAME} PUBLIC tl::expected Crow::Crow)
+if (MSVC)
+    target_compile_options(lib-${PROJECT_NAME} PUBLIC /W4)
+else ()
+    target_compile_options(lib-${PROJECT_NAME} PUBLIC -Wall -Wextra -pedantic)
+endif ()
 
 add_executable(${PROJECT_NAME} src/main.cpp src/bp_user_registration.cpp src/bp_user_registration.hpp)
 target_link_libraries(${PROJECT_NAME}
         PRIVATE
         lib-${PROJECT_NAME}
         )
-target_include_directories(${PROJECT_NAME} PRIVATE ${expected_SOURCE_DIR}/include) 
+target_include_directories(${PROJECT_NAME} PRIVATE ${expected_SOURCE_DIR}/include)
 
 add_executable(bp_main src/bp_main.cpp src/bp_user_registration.cpp src/bp_user_registration.hpp)
 target_link_libraries(bp_main PRIVATE lib-${PROJECT_NAME})
