@@ -17,7 +17,7 @@ crow::json::wvalue error2json(const std::string &errstring) {
 
 int main() {
   crow::App<LoginRequiredMiddleware> app;
-  
+
   crow::mustache::set_global_base("template");
 
   CROW_ROUTE(app, "/posts").methods(crow::HTTPMethod::Get)

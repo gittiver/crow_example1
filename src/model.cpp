@@ -1,8 +1,7 @@
 #include "model.hpp"
 
 
-
-tl::expected <uint64_t, Err> Model::create(const Post &post) {
+tl::expected<uint64_t, Err> Model::create(const Post &post) {
   const std::lock_guard<std::mutex> g(mtx);
   Post p = post;
   p.id = next_id++;
@@ -10,7 +9,7 @@ tl::expected <uint64_t, Err> Model::create(const Post &post) {
   return p.id;
 }
 
-tl::expected <Post, Err> Model::read(uint64_t id) {
+tl::expected<Post, Err> Model::read(uint64_t id) {
   const std::lock_guard<std::mutex> g(mtx);
   auto it = posts_.find(id);
   if (it == posts_.end())
@@ -19,7 +18,7 @@ tl::expected <Post, Err> Model::read(uint64_t id) {
     return it->second;
 }
 
-tl::expected <uint64_t, Err> Model::update(const Post &post) {
+tl::expected<uint64_t, Err> Model::update(const Post &post) {
   const std::lock_guard<std::mutex> g(mtx);
 
   auto it = posts_.find(post.id);
@@ -52,7 +51,7 @@ crow::json::wvalue Post::to_json() const {
   return o;
 }
 
-tl::expected <Post, Err> Post::from_json(const std::string &string) {
+tl::expected<Post, Err> Post::from_json(const std::string &string) {
   Post post;
   auto json = crow::json::load(string);
   if (!json || !json.has("id")) {

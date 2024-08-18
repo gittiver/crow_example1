@@ -14,6 +14,7 @@
 struct AuthContext {
   std::optional<std::string> username;
 };
+
 // Authentication utilities
 bool is_valid(const std::string &username, const std::string &password) {
   return username == "frank" && password == "frank";
@@ -37,7 +38,7 @@ bool validate_authentication(const crow::request &request, crow::response &respo
     size_t found = d_mycreds.find(':');
     std::string username = d_mycreds.substr(0, found);
     std::string password = d_mycreds.substr(found + 1);
-    if (is_valid(username,password))
+    if (is_valid(username, password))
       return true;
     else {
       response.code = crow::status::UNAUTHORIZED;

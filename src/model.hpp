@@ -17,10 +17,11 @@ struct Post {
   std::optional<std::string> content;
 
   [[nodiscard]] crow::json::wvalue to_json() const;
+
   static tl::expected<Post, Err> from_json(const std::string &string);
 };
 
-struct Posts : public std::map<uint64_t, Post>{
+struct Posts : public std::map<uint64_t, Post> {
   [[nodiscard]] crow::json::wvalue to_json() const;
 };
 
@@ -36,9 +37,13 @@ public:
   }
 
   tl::expected<uint64_t, Err> create(const Post &post);
+
   tl::expected<Post, Err> read(uint64_t id);
+
   tl::expected<uint64_t, Err> update(const Post &post);
+
   bool delete_(uint64_t id);
+
   std::string get_token();
 };
   
