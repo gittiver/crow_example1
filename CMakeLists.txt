@@ -60,14 +60,11 @@ FetchContent_MakeAvailable(Catch2)
 add_library(lib-${PROJECT_NAME}
         src/model.cpp
         src/model.hpp
+        src/auth.cpp
         src/auth.hpp
-        )
+        src/auth.cpp
+)
 target_link_libraries(lib-${PROJECT_NAME} PUBLIC tl::expected Crow::Crow)
-if (MSVC)
-    target_compile_options(lib-${PROJECT_NAME} PUBLIC /W4)
-else ()
-    target_compile_options(lib-${PROJECT_NAME} PUBLIC -Wall -Wextra -pedantic)
-endif ()
 
 add_executable(${PROJECT_NAME} src/main.cpp src/bp_user_registration.cpp src/bp_user_registration.hpp)
 target_link_libraries(${PROJECT_NAME}

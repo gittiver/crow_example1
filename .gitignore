@@ -33,6 +33,6 @@
 .idea
 # local build folders
 build
-cmake-build-debug
+cmake-build-*
 /.vs
 /vcpkg_installed
