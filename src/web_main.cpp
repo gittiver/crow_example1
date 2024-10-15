@@ -135,7 +135,7 @@ int main() {
   CROW_ROUTE(app, "/api/login")
       .methods(crow::HTTPMethod::Get, crow::HTTPMethod::Post)
       .CROW_MIDDLEWARES(app, LoginRequiredMiddleware)
-          ([](const crow::request &req) {
+          ([](/*const crow::request& req*/) {
 
              // logged in successfully
              crow::json::wvalue w;
@@ -144,10 +144,11 @@ int main() {
            }
           );
 
+  
   CROW_ROUTE(app, "/api/do_authenticated")
       .methods(crow::HTTPMethod::Post, crow::HTTPMethod::Get)
       .CROW_LOGIN_REQUIRED(app)
-          ([](const crow::request &req) {
+          ([](/*const crow::request& req*/) {
 
             CROW_LOG_INFO
               << "do authenticated after successful authentication";

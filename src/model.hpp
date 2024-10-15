@@ -12,9 +12,9 @@ enum class Err {
 };
 
 struct Post {
-  uint64_t id;
-  std::optional<std::string> title;
-  std::optional<std::string> content;
+    uint64_t id{0};
+    std::optional<std::string> title;
+    std::optional<std::string> content;
 
   [[nodiscard]] crow::json::wvalue to_json() const;
 

@@ -63,7 +63,7 @@ tl::expected<Post, Err> Post::from_json(const std::string &string) {
       post.content = json["content"].s();
 
       return post;
-    } catch (std::exception &e) {
+    } catch (std::exception &/*e*/) {
       return tl::unexpected(Err::JSON_PARSE_ERROR);
     }
   }
