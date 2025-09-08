@@ -73,3 +73,6 @@ target_link_libraries(bp_main PRIVATE lib-${PROJECT_NAME})
 
 add_executable(web_main src/web_main.cpp)
 target_link_libraries(web_main PRIVATE lib-${PROJECT_NAME})
+
+add_executable(resource_main src/resource_main.cpp)
+target_link_libraries(resource_main PRIVATE lib-${PROJECT_NAME})
