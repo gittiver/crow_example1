@@ -21,7 +21,7 @@ include(${CMAKE_SOURCE_DIR}/cmake/CPM.cmake)
 option(${PROJECT_NAME}_ENABLE_TESTS "enable testing" OFF)
 
 CPMAddPackage(Crow
-  VERSION 1.3.3
+  VERSION 1.3.4
   GITHUB_REPOSITORY CrowCpp/Crow
   OPTIONS
   "CROW_BUILD_EXAMPLES Off"
@@ -44,7 +44,7 @@ include(CTest)
 enable_testing()
 
 CPMAddPackage(Catch2
-  VERSION 3.15.2
+  VERSION 3.16.0
   GITHUB_REPOSITORY catchorg/Catch2
   OPTIONS
   "CATCH_INSTALL_DOCS Off"
